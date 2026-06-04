@@ -3,11 +3,11 @@
   <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
-<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="GraphQL" href="graphql.html"><link rel="prev" title="JSON Schema" href="json-schema.html">
+<link rel="index" title="Index" href="../genindex.html"><link rel="search" title="Search" href="../search.html"><link rel="next" title="TypeDB / TypeQL" href="typedb.html"><link rel="prev" title="SQL Validation" href="sqlvalidation.html">
         <link rel="prefetch" href="https://linkml.io/uploads/linkml-logo_color.png" as="image">
 
     <link rel="shortcut icon" href="https://linkml.io/uploads/linkml-logo_color-no-words.png"><!-- Generated with Sphinx 8.2.3 and Furo 2025.09.25 -->
-        <title>ProtoBuf - linkml documentation</title>
+        <title>BigQuery DDL - linkml documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=d111a655" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=580074bf" />
     <link rel="stylesheet" type="text/css" href="../_static/mystnb.8ecb98da25f57f5357bf6f572d296f466b2cfe2517ffebfabe82451661e28f02.css" />
@@ -248,7 +248,7 @@
 </li>
 <li class="toctree-l1 current has-children"><a class="reference internal" href="index.html">Generators</a><input aria-label="Toggle navigation of Generators" checked="" class="toctree-checkbox" id="toctree-checkbox-4" name="toctree-checkbox-4" role="switch" type="checkbox"/><label for="toctree-checkbox-4"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="json-schema.html">JSON Schema</a></li>
-<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">ProtoBuf</a></li>
+<li class="toctree-l2"><a class="reference internal" href="protobuf.html">ProtoBuf</a></li>
 <li class="toctree-l2"><a class="reference internal" href="graphql.html">GraphQL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="jsonld-context.html">JSON-LD Contexts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="jsonld.html">JSON-LD</a></li>
@@ -270,7 +270,7 @@
 <li class="toctree-l2"><a class="reference internal" href="sqltable.html">SQL DDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sqlalchemy.html">SQL Alchemy</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sqlvalidation.html">SQL Validation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="bigquery.html">BigQuery DDL</a></li>
+<li class="toctree-l2 current current-page"><a class="current reference internal" href="#">BigQuery DDL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="typedb.html">TypeDB / TypeQL</a></li>
 <li class="toctree-l2"><a class="reference internal" href="linkml.html">LinkML Generators</a></li>
 <li class="toctree-l2"><a class="reference internal" href="prefixmap.html">Prefix Generator</a></li>
@@ -388,7 +388,7 @@
         </a>
         <div class="content-icon-container">
           <div class="view-this-page">
-  <a class="muted-link" href="../_sources/generators/protobuf.rst.txt" title="View this page">
+  <a class="muted-link" href="../_sources/generators/bigquery.rst.txt" title="View this page">
     <svg><use href="#svg-eye"></use></svg>
     <span class="visually-hidden">View this page</span>
   </a>
@@ -406,114 +406,84 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <section id="protobuf">
-<h1>ProtoBuf<a class="headerlink" href="#protobuf" title="Link to this heading">¶</a></h1>
-<section id="example-output">
-<h2>Example Output<a class="headerlink" href="#example-output" title="Link to this heading">¶</a></h2>
-<p><a class="reference external" href="https://github.com/linkml/linkml/tree/main/examples/PersonSchema/personinfo/protobuf/personinfo.proto">personinfo.schema.proto</a></p>
-</section>
+          <section id="bigquery-ddl">
+<h1>BigQuery DDL<a class="headerlink" href="#bigquery-ddl" title="Link to this heading">¶</a></h1>
 <section id="overview">
 <h2>Overview<a class="headerlink" href="#overview" title="Link to this heading">¶</a></h2>
-<p><a class="reference external" href="https://developers.google.com/protocol-buffers/">Protocol Buffers</a>
-is a protocol for seriaizing data developed by Google.</p>
-<p>Protobuf can be generated from a LinkML schema.</p>
-<p>To run:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gen-proto<span class="w"> </span>personinfo.yaml<span class="w"> </span>&gt;<span class="w"> </span>personinfo.proto
-</pre></div>
+<p>The BigQuery DDL generator produces native <a class="reference external" href="https://cloud.google.com/bigquery">Google BigQuery</a>
+<code class="docutils literal notranslate"><span class="pre">CREATE</span> <span class="pre">TABLE</span></code> statements from a LinkML schema. It extends the SQL DDL generator with
+BigQuery-specific types (<code class="docutils literal notranslate"><span class="pre">ARRAY&lt;T&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">STRUCT&lt;...&gt;</span></code>, <code class="docutils literal notranslate"><span class="pre">TIMESTAMP</span></code>) and supports
+BigQuery table options such as time/range partitioning, clustering, and table descriptions
+via LinkML annotations.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This generator requires the <code class="docutils literal notranslate"><span class="pre">sqlalchemy-bigquery</span></code> optional dependency.
+Install it with: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">'linkml[bigquery]'</span></code></p>
 </div>
-<section id="inheritance">
-<h3>Inheritance<a class="headerlink" href="#inheritance" title="Link to this heading">¶</a></h3>
-<p>Because Protobuf does not support inheritance hierarchy, slots are
-“rolled down” from parent.</p>
-<p>For example, in the personinfo schema, slots such as <cite>id</cite> and <cite>name</cite>
-are inherited from NamedThing, and <cite>aliases</cite> are inherited from a mixin:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">NamedThing</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">slots</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">id</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name</span>
-
-<span class="nt">HasAliases</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">mixin</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="w">  </span><span class="nt">attributes</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">aliases</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">multivalued</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-
-<span class="nt">Person</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">is_a</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">NamedThing</span>
-<span class="w">  </span><span class="nt">mixins</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">HasAliases</span>
-<span class="w">  </span><span class="nt">slots</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">birth_date</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">age_in_years</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gender</span>
-</pre></div>
-</div>
-<p>(some parts truncated for brevity)</p>
-<p>This would generate the following Protobuf:</p>
-<div class="highlight-proto notranslate"><div class="highlight"><pre><span></span><span class="c1">// A generic grouping for any identifiable entity</span>
-<span class="kd">message</span><span class="w"> </span><span class="nc">NamedThing</span>
-<span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
-<span class="w"> </span><span class="p">}</span>
-
-<span class="c1">// A person (alive, dead, undead, or fictional).</span>
-<span class="kd">message</span><span class="w"> </span><span class="nc">Person</span>
-<span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">description</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">image</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">4</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">primaryEmail</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">birthDate</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">6</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">ageInYears</span><span class="w"> </span><span class="na">Integer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">gender</span><span class="w"> </span><span class="na">GenderType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">8</span>
-<span class="w">  </span><span class="k">optional</span><span class="w"> </span><span class="n">currentAddress</span><span class="w"> </span><span class="na">Address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9</span>
-<span class="w">  </span><span class="k">repeated</span><span class="w"> </span><span class="n">hasEmploymentHistory</span><span class="w"> </span><span class="na">EmploymentEvent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span>
-<span class="w">  </span><span class="k">repeated</span><span class="w"> </span><span class="n">hasFamilialRelationships</span><span class="w"> </span><span class="na">FamilialRelationship</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11</span>
-<span class="w">  </span><span class="k">repeated</span><span class="w"> </span><span class="n">hasMedicalHistory</span><span class="w"> </span><span class="na">MedicalEvent</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">12</span>
-<span class="w">  </span><span class="k">repeated</span><span class="w"> </span><span class="n">aliases</span><span class="w"> </span><span class="na">String</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">13</span>
-<span class="w"> </span><span class="p">}</span>
+</section>
+<section id="example-output">
+<h2>Example Output<a class="headerlink" href="#example-output" title="Link to this heading">¶</a></h2>
+<p>Given a schema with a <code class="docutils literal notranslate"><span class="pre">Person</span></code> class, the generator produces DDL like:</p>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="o">`</span><span class="n">Person</span><span class="o">`</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="n">id</span><span class="w"> </span><span class="n">STRING</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<span class="w">  </span><span class="n">name</span><span class="w"> </span><span class="n">STRING</span><span class="p">,</span>
+<span class="w">  </span><span class="n">age</span><span class="w"> </span><span class="n">INT64</span><span class="p">,</span>
+<span class="w">  </span><span class="n">aliases</span><span class="w"> </span><span class="nb">ARRAY</span><span class="o">&lt;</span><span class="n">STRING</span><span class="o">&gt;</span>
+<span class="p">);</span>
 </pre></div>
 </div>
 </section>
+<section id="bigquery-annotations">
+<h2>BigQuery Annotations<a class="headerlink" href="#bigquery-annotations" title="Link to this heading">¶</a></h2>
+<p>You can control BigQuery-specific table options via slot/class annotations:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">bigquery_type</span></code> — override the column type (e.g. <code class="docutils literal notranslate"><span class="pre">TIMESTAMP</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bigquery_partition_by</span></code> — field name to use for time/range partitioning</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bigquery_partition_type</span></code> — <code class="docutils literal notranslate"><span class="pre">DAY</span></code>, <code class="docutils literal notranslate"><span class="pre">HOUR</span></code>, <code class="docutils literal notranslate"><span class="pre">MONTH</span></code>, <code class="docutils literal notranslate"><span class="pre">YEAR</span></code>, or <code class="docutils literal notranslate"><span class="pre">RANGE</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bigquery_cluster_by</span></code> — comma-separated field names for clustering</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">bigquery_description</span></code> — table-level description string</p></li>
+</ul>
 </section>
 <section id="docs">
 <h2>Docs<a class="headerlink" href="#docs" title="Link to this heading">¶</a></h2>
 <section id="command-line">
 <h3>Command Line<a class="headerlink" href="#command-line" title="Link to this heading">¶</a></h3>
-<section id="gen-proto">
-<h4>gen-proto<a class="headerlink" href="#gen-proto" title="Link to this heading">¶</a></h4>
-<p>Generate proto representation of LinkML model</p>
-<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>gen-proto<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>YAMLFILE
+<section id="gen-bigquery">
+<h4>gen-bigquery<a class="headerlink" href="#gen-bigquery" title="Link to this heading">¶</a></h4>
+<p>Generate BigQuery DDL representation</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>gen-bigquery<span class="w"> </span><span class="o">[</span>OPTIONS<span class="o">]</span><span class="w"> </span>YAMLFILE
 </pre></div>
 </div>
 <p class="rubric">Options</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-V">
-<span id="cmdoption-gen-proto-version"></span><span class="sig-name descname"><span class="pre">-V</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-proto-V" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-dataset">
+<span class="sig-name descname"><span class="pre">--dataset</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;dataset&gt;</span></span><a class="headerlink" href="#cmdoption-gen-bigquery-dataset" title="Link to this definition">¶</a></dt>
+<dd><p>BigQuery dataset prefix</p>
+</dd></dl>
+
+<dl class="std option">
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-V">
+<span id="cmdoption-gen-bigquery-version"></span><span class="sig-name descname"><span class="pre">-V</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--version</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-bigquery-V" title="Link to this definition">¶</a></dt>
 <dd><p>Show the version and exit.</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-f">
-<span id="cmdoption-gen-proto-format"></span><span class="sig-name descname"><span class="pre">-f</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--format</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;format&gt;</span></span><a class="headerlink" href="#cmdoption-gen-proto-f" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-f">
+<span id="cmdoption-gen-bigquery-format"></span><span class="sig-name descname"><span class="pre">-f</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--format</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;format&gt;</span></span><a class="headerlink" href="#cmdoption-gen-bigquery-f" title="Link to this definition">¶</a></dt>
 <dd><p>Output format</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
-<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'proto'</span></code></p>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">'bigquery'</span></code></p>
 </dd>
 <dt class="field-even">Options<span class="colon">:</span></dt>
-<dd class="field-even"><p>proto</p>
+<dd class="field-even"><p>bigquery</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-metadata">
-<span id="cmdoption-gen-proto-no-metadata"></span><span class="sig-name descname"><span class="pre">--metadata</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-metadata</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-proto-metadata" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-metadata">
+<span id="cmdoption-gen-bigquery-no-metadata"></span><span class="sig-name descname"><span class="pre">--metadata</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-metadata</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-bigquery-metadata" title="Link to this definition">¶</a></dt>
 <dd><p>Include metadata in output</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
@@ -523,8 +493,8 @@ are inherited from NamedThing, and <cite>aliases</cite> are inherited from a mix
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-useuris">
-<span id="cmdoption-gen-proto-metauris"></span><span class="sig-name descname"><span class="pre">--useuris</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--metauris</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-proto-useuris" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-useuris">
+<span id="cmdoption-gen-bigquery-metauris"></span><span class="sig-name descname"><span class="pre">--useuris</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--metauris</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-bigquery-useuris" title="Link to this definition">¶</a></dt>
 <dd><p>Use class and slot URIs over model uris</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
@@ -534,14 +504,14 @@ are inherited from NamedThing, and <cite>aliases</cite> are inherited from a mix
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-im">
-<span id="cmdoption-gen-proto-importmap"></span><span class="sig-name descname"><span class="pre">-im</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--importmap</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;importmap&gt;</span></span><a class="headerlink" href="#cmdoption-gen-proto-im" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-im">
+<span id="cmdoption-gen-bigquery-importmap"></span><span class="sig-name descname"><span class="pre">-im</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--importmap</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;importmap&gt;</span></span><a class="headerlink" href="#cmdoption-gen-bigquery-im" title="Link to this definition">¶</a></dt>
 <dd><p>Import mapping file</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-log_level">
-<span class="sig-name descname"><span class="pre">--log_level</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;log_level&gt;</span></span><a class="headerlink" href="#cmdoption-gen-proto-log_level" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-log_level">
+<span class="sig-name descname"><span class="pre">--log_level</span></span><span class="sig-prename descclassname"> <span class="pre">&lt;log_level&gt;</span></span><a class="headerlink" href="#cmdoption-gen-bigquery-log_level" title="Link to this definition">¶</a></dt>
 <dd><p>Logging level</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
@@ -554,20 +524,20 @@ are inherited from NamedThing, and <cite>aliases</cite> are inherited from a mix
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-v">
-<span id="cmdoption-gen-proto-verbose"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--verbose</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-proto-v" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-v">
+<span id="cmdoption-gen-bigquery-verbose"></span><span class="sig-name descname"><span class="pre">-v</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--verbose</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-bigquery-v" title="Link to this definition">¶</a></dt>
 <dd><p>Verbosity. Takes precedence over –log_level.</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-mergeimports">
-<span id="cmdoption-gen-proto-no-mergeimports"></span><span class="sig-name descname"><span class="pre">--mergeimports</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-mergeimports</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-proto-mergeimports" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-mergeimports">
+<span id="cmdoption-gen-bigquery-no-mergeimports"></span><span class="sig-name descname"><span class="pre">--mergeimports</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-mergeimports</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-bigquery-mergeimports" title="Link to this definition">¶</a></dt>
 <dd><p>Merge imports into source file (default=mergeimports)</p>
 </dd></dl>
 
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-stacktrace">
-<span id="cmdoption-gen-proto-no-stacktrace"></span><span class="sig-name descname"><span class="pre">--stacktrace</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-stacktrace</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-proto-stacktrace" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-stacktrace">
+<span id="cmdoption-gen-bigquery-no-stacktrace"></span><span class="sig-name descname"><span class="pre">--stacktrace</span></span><span class="sig-prename descclassname"></span><span class="sig-prename descclassname"><span class="pre">,</span> </span><span class="sig-name descname"><span class="pre">--no-stacktrace</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-bigquery-stacktrace" title="Link to this definition">¶</a></dt>
 <dd><p>Print a stack trace when an error occurs</p>
 <dl class="field-list simple">
 <dt class="field-odd">Default<span class="colon">:</span></dt>
@@ -578,8 +548,8 @@ are inherited from NamedThing, and <cite>aliases</cite> are inherited from a mix
 
 <p class="rubric">Arguments</p>
 <dl class="std option">
-<dt class="sig sig-object std" id="cmdoption-gen-proto-arg-YAMLFILE">
-<span class="sig-name descname"><span class="pre">YAMLFILE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-proto-arg-YAMLFILE" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object std" id="cmdoption-gen-bigquery-arg-YAMLFILE">
+<span class="sig-name descname"><span class="pre">YAMLFILE</span></span><span class="sig-prename descclassname"></span><a class="headerlink" href="#cmdoption-gen-bigquery-arg-YAMLFILE" title="Link to this definition">¶</a></dt>
 <dd><p>Required argument</p>
 </dd></dl>
 
@@ -588,12 +558,25 @@ are inherited from NamedThing, and <cite>aliases</cite> are inherited from a mix
 <section id="code">
 <h3>Code<a class="headerlink" href="#code" title="Link to this heading">¶</a></h3>
 <dl class="py class">
-<dt class="sig sig-object py" id="linkml.generators.protogen.ProtoGenerator">
-<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml.generators.protogen.</span></span><span class="sig-name descname"><span class="pre">ProtoGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~typing.TextIO</span> <span class="pre">|</span> <span class="pre">~linkml_runtime.linkml_model.meta.SchemaDefinition</span> <span class="pre">|</span> <span class="pre">~linkml.utils.generator.Generator</span> <span class="pre">|</span> <span class="pre">~pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schemaview:</span> <span class="pre">~linkml_runtime.utils.schemaview.SchemaView</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useuris:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_level:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mergeimports:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_file_date:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_file_size:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger:</span> <span class="pre">~logging.Logger</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespaces:</span> <span class="pre">~linkml_runtime.utils.namespaces.Namespaces</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_output:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_dir:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metamodel_name_map:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">importmap:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~collections.abc.Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emit_prefixes:</span> <span class="pre">set[str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metamodel:</span> <span class="pre">~linkml.utils.schemaloader.SchemaLoader</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacktrace:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~pathlib.Path</span> <span class="pre">|</span> <span class="pre">~linkml_runtime.linkml_model.meta.SchemaDefinition</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_slot_num:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml/generators/protogen.html#ProtoGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml.generators.protogen.ProtoGenerator" title="Link to this definition">¶</a></dt>
-<dd><p>A <cite>Generator</cite> for creating Protobuf schemas from a linkml schema.</p>
+<dt class="sig sig-object py" id="linkml.generators.bigquerygen.BigQueryGenerator">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">linkml.generators.bigquerygen.</span></span><span class="sig-name descname"><span class="pre">BigQueryGenerator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~typing.TextIO</span> <span class="pre">|</span> <span class="pre">~linkml_runtime.linkml_model.meta.SchemaDefinition</span> <span class="pre">|</span> <span class="pre">Generator</span> <span class="pre">|</span> <span class="pre">~pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schemaview:</span> <span class="pre">~linkml_runtime.utils.schemaview.SchemaView</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metadata:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">useuris:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_level:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mergeimports:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_file_date:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source_file_size:</span> <span class="pre">int</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger:</span> <span class="pre">~logging.Logger</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose:</span> <span class="pre">bool</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespaces:</span> <span class="pre">~linkml_runtime.utils.namespaces.Namespaces</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directory_output:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">base_dir:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metamodel_name_map:</span> <span class="pre">dict[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">importmap:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~collections.abc.Mapping[str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">str]</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emit_prefixes:</span> <span class="pre">set[str]</span> <span class="pre">=</span> <span class="pre">&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metamodel:</span> <span class="pre">~linkml.utils.schemaloader.SchemaLoader</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stacktrace:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">~pathlib.Path</span> <span class="pre">|</span> <span class="pre">~linkml_runtime.linkml_model.meta.SchemaDefinition</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_inherits:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dialect:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'sqlite'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inject_primary_keys:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_foreign_keys:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rename_foreign_keys:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direct_mapping:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">relative_slot_num:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_length_oracle:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">4096</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_abstract_class_ddl:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">autogenerate_index:</span> <span class="pre">bool</span> <span class="pre">=</span> <span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset:</span> <span class="pre">str</span> <span class="pre">|</span> <span class="pre">None</span> <span class="pre">=</span> <span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/linkml/generators/bigquerygen.html#BigQueryGenerator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml.generators.bigquerygen.BigQueryGenerator" title="Link to this definition">¶</a></dt>
+<dd><p>A Generator for BigQuery CREATE TABLE DDL.</p>
+<p>Produces native BigQuery DDL including ARRAY&lt;T&gt;, STRUCT&lt;…&gt;,
+PARTITION BY, CLUSTER BY, and OPTIONS clauses.</p>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">gen</span> <span class="o">=</span> <span class="n">BigQueryGenerator</span><span class="p">(</span><span class="s2">&quot;schema.yaml&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gen</span><span class="o">.</span><span class="n">serialize</span><span class="p">())</span>
+</pre></div>
+</div>
 <dl class="py method">
-<dt class="sig sig-object py" id="linkml.generators.protogen.ProtoGenerator.serialize">
-<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="headerlink" href="#linkml.generators.protogen.ProtoGenerator.serialize" title="Link to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="linkml.generators.bigquerygen.BigQueryGenerator.generate_ddl">
+<span class="sig-name descname"><span class="pre">generate_ddl</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/linkml/generators/bigquerygen.html#BigQueryGenerator.generate_ddl"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml.generators.bigquerygen.BigQueryGenerator.generate_ddl" title="Link to this definition">¶</a></dt>
+<dd><p>Generate BigQuery CREATE TABLE DDL for all non-abstract, non-mixin classes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="linkml.generators.bigquerygen.BigQueryGenerator.serialize">
+<span class="sig-name descname"><span class="pre">serialize</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/linkml/generators/bigquerygen.html#BigQueryGenerator.serialize"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#linkml.generators.bigquerygen.BigQueryGenerator.serialize" title="Link to this definition">¶</a></dt>
 <dd><p>Generate output in the required format</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -616,23 +599,23 @@ are inherited from NamedThing, and <cite>aliases</cite> are inherited from a mix
       <footer>
         
         <div class="related-pages">
-          <a class="next-page" href="graphql.html">
+          <a class="next-page" href="typedb.html">
               <div class="page-info">
                 <div class="context">
                   <span>Next</span>
                 </div>
-                <div class="title">GraphQL</div>
+                <div class="title">TypeDB / TypeQL</div>
               </div>
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
             </a>
-          <a class="prev-page" href="json-schema.html">
+          <a class="prev-page" href="sqlvalidation.html">
               <svg class="furo-related-icon"><use href="#svg-arrow-right"></use></svg>
               <div class="page-info">
                 <div class="context">
                   <span>Previous</span>
                 </div>
                 
-                <div class="title">JSON Schema</div>
+                <div class="title">SQL Validation</div>
                 
               </div>
             </a>
@@ -666,20 +649,19 @@ are inherited from NamedThing, and <cite>aliases</cite> are inherited from a mix
         <div class="toc-tree-container">
           <div class="toc-tree">
             <ul>
-<li><a class="reference internal" href="#">ProtoBuf</a><ul>
+<li><a class="reference internal" href="#">BigQuery DDL</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
 <li><a class="reference internal" href="#example-output">Example Output</a></li>
-<li><a class="reference internal" href="#overview">Overview</a><ul>
-<li><a class="reference internal" href="#inheritance">Inheritance</a></li>
-</ul>
-</li>
+<li><a class="reference internal" href="#bigquery-annotations">BigQuery Annotations</a></li>
 <li><a class="reference internal" href="#docs">Docs</a><ul>
 <li><a class="reference internal" href="#command-line">Command Line</a><ul>
-<li><a class="reference internal" href="#gen-proto">gen-proto</a></li>
+<li><a class="reference internal" href="#gen-bigquery">gen-bigquery</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#code">Code</a><ul>
-<li><a class="reference internal" href="#linkml.generators.protogen.ProtoGenerator"><code class="docutils literal notranslate"><span class="pre">ProtoGenerator</span></code></a><ul>
-<li><a class="reference internal" href="#linkml.generators.protogen.ProtoGenerator.serialize"><code class="docutils literal notranslate"><span class="pre">ProtoGenerator.serialize()</span></code></a></li>
+<li><a class="reference internal" href="#linkml.generators.bigquerygen.BigQueryGenerator"><code class="docutils literal notranslate"><span class="pre">BigQueryGenerator</span></code></a><ul>
+<li><a class="reference internal" href="#linkml.generators.bigquerygen.BigQueryGenerator.generate_ddl"><code class="docutils literal notranslate"><span class="pre">BigQueryGenerator.generate_ddl()</span></code></a></li>
+<li><a class="reference internal" href="#linkml.generators.bigquerygen.BigQueryGenerator.serialize"><code class="docutils literal notranslate"><span class="pre">BigQueryGenerator.serialize()</span></code></a></li>
 </ul>
 </li>
 </ul>
